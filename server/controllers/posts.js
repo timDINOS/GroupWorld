@@ -1,6 +1,9 @@
 import PostMsg from '../models/posting.js';
-import PostMessage from '../models/posting.js'
 
+import express from 'express';
+
+
+const router = express.Router();
 
 export const getPosts = async (request, response) => {
     try {
@@ -15,12 +18,12 @@ export const getPosts = async (request, response) => {
 
 
 export const createPost = async (request, response) => {
-    const post = req.body;
+    const {title, message, selectedFile, creator, tags} = request.body;
 
-    const currentPost = new PostMsg(post);
+    const currentPost = new PostMsg({title, message, selectedFile, creator, tags});
 
     try {
-        await newPost.save();
+        await currentPost.save();
         response.status(201).json(currentPost);
     } catch (error) {
         response.status(409).json({message: error.message});
