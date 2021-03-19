@@ -3,24 +3,40 @@ import {TextField, Button, Typography, Paper } from '@material-ui/core';
 import {useState} from 'react';
 import FileBase from 'react-file-base64';
 import {useDispatch } from 'react-redux';
-import {createPost } from '../../actions/posts';
+import {createPost, updatePost } from '../../actions/posts';
+import { useSelector } from 'react-redux';
+
+import {useEffect } from 'react';
+
 
 import useStyles from './style';
 import Post from '../Posts/Post/Post';
 
-const Form = () => {
+const Form = ({currentId, setCurrentId}) => {
     const classes = useStyles();
     const [postData, setPostData] = useState({ creator: '', title: '', message: '', tags: '', selectedFile: ''});
+    const post = useSelector((state) => (currentId ? state.posts.find((p) => p._id == currentId) : null));
     const dispatch = useDispatch();
-    const handleSubmit = (e) => {
+
+    useEffect(() => {
+        if(post) setPostData(post);
+    }, [post]);
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        dispatch(createPost(postData));
-    }
+        if(currentId) {
+            dispatch(updatePost(currentId, postData));
+        }
+        else {
+            dispatch(createPost(postData));
+            clear();
+        }
+    };
 
     const clear = () => {
-
-    }
+        setCurrentId(0);
+        setPostData({creator: '', title: '', message: '', tags: '', selectedFile: ''});
+    };
     return (
        <Paper className = {classes.paper}>
            <form autoComplete="off" noValidate className={`${classes.root} ${classes.form}`} onSubmit={handleSubmit}>
